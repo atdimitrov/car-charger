@@ -6,10 +6,10 @@
 #include "wifi-config.h"
 #include "charging-session.h"
 
-#define CAR_CHARGING_PORT 15
-#define EMPTY_PORT_1 2
-#define EMPTY_PORT_2 0
-#define EMPTY_PORT_3 4
+#define CAR_CHARGING_PORT 4
+#define EMPTY_PORT_1 0
+#define EMPTY_PORT_2 15
+#define EMPTY_PORT_3 2
 
 AsyncWebServer server(80);
 
@@ -124,11 +124,6 @@ void setup()
 {
     Serial.begin(115200);
 
-    WiFiConfig wifiConfig = readWifiConfig();
-    connectToWiFi(wifiConfig);
-
-    runWebServer();
-
     pinMode(CAR_CHARGING_PORT, OUTPUT);
     pinMode(EMPTY_PORT_1, OUTPUT);
     pinMode(EMPTY_PORT_2, OUTPUT);
@@ -138,6 +133,11 @@ void setup()
     digitalWrite(EMPTY_PORT_1, HIGH);
     digitalWrite(EMPTY_PORT_2, HIGH);
     digitalWrite(EMPTY_PORT_3, HIGH);
+
+    WiFiConfig wifiConfig = readWifiConfig();
+    connectToWiFi(wifiConfig);
+
+    runWebServer();
 }
 
 void loop()
