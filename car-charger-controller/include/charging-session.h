@@ -6,6 +6,7 @@
 
 enum ChargingSessionStatus
 {
+    notStarted,
     waiting,
     inProgress,
     ended,
