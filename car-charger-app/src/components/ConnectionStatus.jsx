@@ -1,16 +1,13 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
-import Box from '@mui/material/Box';
 
-import DownloadingRoundedIcon from '@mui/icons-material/DownloadingRounded';
-import CheckCircleOutlineRoundedIcon from '@mui/icons-material/CheckCircleOutlineRounded';
-import DoDisturbAltRoundedIcon from '@mui/icons-material/DoDisturbAltRounded';
+import Box from '@mui/material/Box';
+import LinearProgress from '@mui/material/LinearProgress';
+
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 
 const getBackgroundColor = ({ attemptMade, connected }) => {
-    if (!attemptMade) {
-        return '#CCCCCC';
-    }
-
     if (connected) {
         return '#60A05B';
     }
@@ -18,16 +15,16 @@ const getBackgroundColor = ({ attemptMade, connected }) => {
     return '#FF5047';
 };
 
-const getIcon = ({ attemptMade, connected }) => {
+const getContent = ({ attemptMade, connected }) => {
     if (!attemptMade) {
-        return <DownloadingRoundedIcon />;
+        return <LinearProgress sx={{ width: '100%' }} />;
     }
 
     if (connected) {
-        return <CheckCircleOutlineRoundedIcon />;
+        return <CheckRoundedIcon />;
     }
 
-    return <DoDisturbAltRoundedIcon />
+    return <CloseRoundedIcon />
 };
 
 const ConnectionStatus = () => {
@@ -46,7 +43,7 @@ const ConnectionStatus = () => {
                 justifyContent: 'center'
             }}
         >
-            {getIcon(connection)}
+            {getContent(connection)}
         </Box>
     );
 }
