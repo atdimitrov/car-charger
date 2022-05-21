@@ -35,9 +35,17 @@ void connectToWiFi(WiFiConfig wifiConfig)
 
 void runWebServer()
 {
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Origin", "*");
+    DefaultHeaders::Instance().addHeader("Access-Control-Allow-Headers", "*");
+
     server.on("/status", HTTP_GET, [](AsyncWebServerRequest *request)
     {
         request->send(200, "text/plain", "Up and running.");
+    });
+
+    server.on("/car-charging/start", HTTP_OPTIONS, [](AsyncWebServerRequest *request)
+    {
+        request->send(200);
     });
 
     server.addHandler(new AsyncCallbackJsonWebHandler("/car-charging/start", [](AsyncWebServerRequest *request, JsonVariant &json)
@@ -58,7 +66,7 @@ void runWebServer()
         }
 
         currentChargingSession = new ChargingSession(currentTime + offset, duration);
-        
+
         request->send(200);
     }));
 
@@ -125,10 +133,7 @@ void runWebServer()
         char result[256];
         serializeJson(doc, result, sizeof(result));
 
-        AsyncWebServerResponse* response = request->beginResponse(200, "application/json", result);
-	    response->addHeader("Access-Control-Allow-Origin", "*");
-
-        request->send(response);
+        request->send(200, "application/json", result);
     });
 
     server.begin();
