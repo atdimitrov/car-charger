@@ -80,50 +80,55 @@ void runWebServer()
 
     server.on("/car-charging/status", HTTP_GET, [](AsyncWebServerRequest *request)
     {
-        if (currentChargingSession == nullptr)
-        {
-            request->send(404);
-            return;
-        }
-
         StaticJsonDocument<256> doc;
 
-        time_t currentTime = time(NULL);
-        uint64_t startTime = currentChargingSession->startTime;
-        uint64_t duration = currentChargingSession->duration;
-        ChargingSessionStatus status = currentChargingSession->getStatus();
-        doc["status"] = status;
-        doc["duration"] = duration;
-        if (status == waiting)
+        if (currentChargingSession == nullptr)
         {
-            doc["timeToStart"] = startTime - currentTime;
-            doc["progress"] = 0.0;
-        }
-        else if (status == inProgress)
-        {
-            doc["timeToEnd"] = startTime + duration - currentTime;
-            doc["progress"] = (double)(currentTime - startTime) / duration;
-        }
-        else if (status == stopped)
-        {
-            time_t stopTime = *currentChargingSession->stopTime;
-            if (startTime < stopTime)
-            {
-                doc["progress"] = (double)(stopTime - startTime) / duration;
-            }
-            else
-            {
-                doc["progress"] = 0.0;
-            }
+            doc["status"] = notStarted;
         }
         else
         {
-            doc["progress"] = 1.0;
+            time_t currentTime = time(NULL);
+            uint64_t startTime = currentChargingSession->startTime;
+            uint64_t duration = currentChargingSession->duration;
+            ChargingSessionStatus status = currentChargingSession->getStatus();
+            doc["status"] = status;
+            doc["duration"] = duration;
+            if (status == waiting)
+            {
+                doc["timeToStart"] = startTime - currentTime;
+                doc["progress"] = 0.0;
+            }
+            else if (status == inProgress)
+            {
+                doc["timeToEnd"] = startTime + duration - currentTime;
+                doc["progress"] = (double)(currentTime - startTime) / duration;
+            }
+            else if (status == stopped)
+            {
+                time_t stopTime = *currentChargingSession->stopTime;
+                if (startTime < stopTime)
+                {
+                    doc["progress"] = (double)(stopTime - startTime) / duration;
+                }
+                else
+                {
+                    doc["progress"] = 0.0;
+                }
+            }
+            else
+            {
+                doc["progress"] = 1.0;
+            }
         }
-        
+
         char result[256];
         serializeJson(doc, result, sizeof(result));
-        request->send(200, "application/json", result);
+
+        AsyncWebServerResponse* response = request->beginResponse(200, "application/json", result);
+	    response->addHeader("Access-Control-Allow-Origin", "*");
+
+        request->send(response);
     });
 
     server.begin();
