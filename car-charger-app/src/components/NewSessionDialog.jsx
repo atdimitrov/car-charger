@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { startOfToday, addHours } from 'date-fns'
+import { startOfToday, addHours, differenceInSeconds } from 'date-fns'
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 import useTheme from '@mui/material/styles/useTheme';
-import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -13,12 +12,17 @@ import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import Stack from '@mui/material/Stack';
-import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import Chip from '@mui/material/Chip';
 import InputAdornment from '@mui/material/InputAdornment';
+import PlayArrowRoundedIcon from '@mui/icons-material/PlayArrowRounded';
+import CheckRoundedIcon from '@mui/icons-material/CheckRounded';
 import PercentRoundedIcon from '@mui/icons-material/PercentRounded';
 
 import { close } from '../store/slices/newSessionDialogSlice';
+import { startSession } from '../store/actions';
+
+const batteryCapacityKWh = 27.7;
+const chargingSpeedKW = 2.1;
 
 const now = 'Now';
 const eco = 'Eco';
@@ -160,8 +164,17 @@ const NewSessionDialog = () => {
                 <Button
                     autoFocus
                     variant='contained'
-                    onClick={() => dispatch(close())}
                     endIcon={<PlayArrowRoundedIcon />}
+                    onClick={() => {
+                        const capacityToCharge = batteryCapacityKWh * ((targetBatteryPercentage - startBatteryPercentage) / 100);
+                        const hoursToCharge = capacityToCharge / chargingSpeedKW;
+                        
+                        dispatch(startSession({
+                            offset: differenceInSeconds(startTime, new Date()),
+                            duration: Math.ceil(hoursToCharge * 60 * 60)
+                        }));
+                        dispatch(close());
+                    }}
                 >
                     Start
                 </Button>

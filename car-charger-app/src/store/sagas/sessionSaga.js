@@ -1,12 +1,15 @@
-import { call, put } from 'redux-saga/effects';
+import { call, put, takeEvery } from 'redux-saga/effects';
 import delay from '@redux-saga/delay-p';
 
 import { connect, disconnect } from '../slices/connectionSlice';
 import { set } from '../slices/sessionSlice';
+import { startSessionType, refreshSessionStatusType, refreshSessionStatus } from '../actions';
+
+const baseUrl = 'http://192.168.0.154';
 
 const sessionSaga = function* () {
     try {
-        const result = yield call(fetch, 'http://192.168.0.154/car-charging/status');
+        const result = yield call(fetch, `${baseUrl}/car-charging/status`);
         if (result.ok) {
             const session = yield result.json();
             yield put(set(session));
@@ -19,7 +22,26 @@ const sessionSaga = function* () {
     }
 };
 
+const startNewSessionSaga = function* ({ payload }) {
+    try {
+        yield call(fetch, `${baseUrl}/car-charging/start`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        yield put(refreshSessionStatus());
+    } catch (err) {
+        console.log('Failed to start new session', err);
+    }
+};
+
 const runSessionSaga = function* () {
+    yield takeEvery(startSessionType, startNewSessionSaga);
+    yield takeEvery(refreshSessionStatusType, sessionSaga);
+
     while (true) {
         yield call(sessionSaga);
         yield delay(10000);
