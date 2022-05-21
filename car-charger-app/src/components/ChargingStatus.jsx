@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { addSeconds, format } from 'date-fns';
+import { useDispatch, useSelector } from 'react-redux';
+import { addMinutes, addSeconds, format, isEqual } from 'date-fns';
 
 import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 
-const zeroDate = new Date(0);
+import { refreshSessionStatus } from '../store/actions';
+
+const zeroDate = addMinutes(new Date(0), new Date(0).getTimezoneOffset());
 
 const createLoadingIndicator = (variant, value, topLabel, mainLabel, bottomLabel) => {
     return (
@@ -30,7 +32,7 @@ const createLoadingIndicator = (variant, value, topLabel, mainLabel, bottomLabel
                 }}
             >
                 {topLabel && <Typography variant='subtitle'>{topLabel}</Typography>}
-                <Typography variant='h2'>{mainLabel}</Typography>
+                <Typography variant='h3'>{mainLabel}</Typography>
                 {bottomLabel && <Typography variant='subtitle'>{bottomLabel}</Typography>}
             </Stack>
         </Box>
@@ -40,13 +42,13 @@ const createLoadingIndicator = (variant, value, topLabel, mainLabel, bottomLabel
 const asPercent = progress => {
     const formatted = progress.toLocaleString('en-US', {
         minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
+        maximumFractionDigits: 2
     });
 
     return `${formatted}%`;
 }
 
-const formatTime = time => format(time, 'mm:ss');
+const formatTime = time => format(time, 'HH:mm:ss');
 
 const getBottomLabelForState = ({ status, time }) => {
     if (status === 2) {
@@ -61,8 +63,10 @@ const getBottomLabelForState = ({ status, time }) => {
 }
 
 const ChargingStatus = () => {
-    const [state, setState] = useState();
+    const dispatch = useDispatch();
     const session = useSelector(state => state.session);
+
+    const [state, setState] = useState();
 
     useEffect(() => {
         if (session.status === 0) {
@@ -82,21 +86,30 @@ const ChargingStatus = () => {
         }
 
         setState(newState);
-
-        if (session.status === 1 || session.status === 2) {
-            const timer = setInterval(() => {
-                setState(oldState => {
-                    const newState = { ...oldState };
-                    if (oldState.time > zeroDate) {
-                        newState.time = addSeconds(oldState.time, -1);
-                    }
-                    return newState;
-                });
-            }, 1000);
-    
-            return () => clearInterval(timer);
-        }
     }, [session]);
+
+    useEffect(() => {
+        if (!state) return;
+
+        if (state.status === 1 || state.status === 2) {
+
+            if (isEqual(state.time, zeroDate)) {
+                dispatch(refreshSessionStatus());
+            } else {
+                const timer = setTimeout(() => {
+                    setState(oldState => {
+                        const newState = { ...oldState };
+                        if (oldState.time > zeroDate) {
+                            newState.time = addSeconds(oldState.time, -1);
+                        }
+                        return newState;
+                    });
+                }, 1000);
+        
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [state, dispatch]);
 
     if (!state) {
         return <Typography variant='h6'>No previous charging session found</Typography>;

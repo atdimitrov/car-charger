@@ -1,4 +1,4 @@
-import { call, put, takeEvery } from 'redux-saga/effects';
+import { call, put, takeEvery, takeLatest } from 'redux-saga/effects';
 import delay from '@redux-saga/delay-p';
 
 import { connect, disconnect } from '../slices/connectionSlice';
@@ -40,7 +40,7 @@ const startNewSessionSaga = function* ({ payload }) {
 
 const runSessionSaga = function* () {
     yield takeEvery(startSessionType, startNewSessionSaga);
-    yield takeEvery(refreshSessionStatusType, sessionSaga);
+    yield takeLatest(refreshSessionStatusType, sessionSaga);
 
     while (true) {
         yield call(sessionSaga);
