@@ -23,6 +23,7 @@ import Chip from '@mui/material/Chip';
 import InputAdornment from '@mui/material/InputAdornment';
 import PercentRoundedIcon from '@mui/icons-material/PercentRounded';
 
+import ConnectionStatus from './components/ConnectionStatus';
 import ChargingStatus from './components/ChargingStatus';
 
 const now = 'Now';
@@ -83,6 +84,7 @@ const App = () => {
                 justifyContent: 'center'
             }}
         >
+            <ConnectionStatus />
             <ChargingStatus />
             <SpeedDial
                 ariaLabel="Car charger SpeedDial"

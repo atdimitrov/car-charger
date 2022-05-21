@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const statusSlice = createSlice({
-    name: 'status',
+const sessionSlice = createSlice({
+    name: 'session',
     initialState: {
         status: 0,
         duration: 0,
@@ -16,6 +16,6 @@ const statusSlice = createSlice({
     }
 });
 
-export const { set } = statusSlice.actions;
+export const { set } = sessionSlice.actions;
 
-export default statusSlice.reducer;
+export default sessionSlice.reducer;

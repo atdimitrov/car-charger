@@ -2,13 +2,15 @@ import { configureStore } from '@reduxjs/toolkit';
 import createSagaMiddleware from 'redux-saga';
 
 import rootSaga from './sagas';
-import statusSlice from './slices/statusSlice';
+import connectionSlice from './slices/connectionSlice';
+import sessionSlice from './slices/sessionSlice';
 
 const sagaMiddleware = createSagaMiddleware();
 
 const store = configureStore({
     reducer: {
-        status: statusSlice
+        connection: connectionSlice,
+        session: sessionSlice
     },
     middleware: [sagaMiddleware]
 });

@@ -1,10 +1,10 @@
 import { all } from 'redux-saga/effects';
 
-import statusSaga from './statusSaga';
+import sessionSaga from './sessionSaga';
 
 const rootSaga = function* () {
     yield all([
-        statusSaga()
+        sessionSaga()
     ]);
 };
 
