@@ -1,0 +1,8 @@
+# Ignore everything
+**
+
+# Except
+!/public
+!/src
+!package*.json
+!nginx.conf
