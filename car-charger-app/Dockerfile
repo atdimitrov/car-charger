@@ -11,5 +11,7 @@ RUN npm run build
 
 FROM nginx:1.21.6-alpine
 
+EXPOSE 20000
+
 COPY nginx.conf /etc/nginx/nginx.conf
-COPY --from=builder /app/build /data/www/car-charging
+COPY --from=builder /app/build /data/www/car-charging-app
