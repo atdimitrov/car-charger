@@ -5,7 +5,7 @@ import { connect, disconnect } from '../slices/connectionSlice';
 import { set } from '../slices/sessionSlice';
 import { startSessionType, refreshSessionStatusType, refreshSessionStatus } from '../actions';
 
-const baseUrl = 'http://192.168.0.154';
+const baseUrl = 'https://controller.car-charging.lan';
 
 const sessionSaga = function* () {
     try {
